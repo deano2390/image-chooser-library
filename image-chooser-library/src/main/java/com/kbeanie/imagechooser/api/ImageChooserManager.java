@@ -209,7 +209,10 @@ public class ImageChooserManager extends BChooser implements
                 choosePicture();
                 break;
             case ChooserType.REQUEST_CAPTURE_PICTURE:
-                path = takePicture();
+                path = takePicture(false);
+                break;
+            case ChooserType.REQUEST_CAPTURE_PICTURE_FRONT_CAM:
+                path = takePicture(true);
                 break;
             default:
                 throw new ChooserException(
@@ -232,12 +235,16 @@ public class ImageChooserManager extends BChooser implements
         }
     }
 
-    private String takePicture() throws ChooserException {
+    private String takePicture(boolean frontCameraHint) throws ChooserException {
         checkDirectory();
         try {
             Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
             filePathOriginal = buildFilePathOriginal(foldername, "jpg");
             intent.putExtra(MediaStore.EXTRA_OUTPUT, buildCaptureUri(filePathOriginal));
+
+            if (frontCameraHint)
+                intent.putExtra("android.intent.extras.CAMERA_FACING", 1);
+
             if (extras != null) {
                 intent.putExtras(extras);
             }
